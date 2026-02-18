@@ -1,0 +1,21 @@
+# Build artifacts
+build/
+.gradle/
+*.jar
+*.war
+
+# IDE
+.idea/
+.vscode/
+*.iml
+
+# Git
+.git/
+.gitignore
+
+# Docs
+docs/
+README.md
+
+# Logs
+*.log

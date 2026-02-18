@@ -17,10 +17,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-/**
- * Configuration de la sécurité Spring Security
- * Gère l'authentification JWT et les autorisations
- */
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
@@ -32,18 +28,11 @@ public class SecurityConfig {
     @Autowired
     private JwtAuthenticationFilter jwtAuthenticationFilter;
 
-    /**
-     * Bean pour encoder les mots de passe avec BCrypt
-     */
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
-    /**
-     * Provider d'authentification
-     * Connecte UserDetailsService + PasswordEncoder
-     */
     @Bean
     public DaoAuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
@@ -52,49 +41,36 @@ public class SecurityConfig {
         return authProvider;
     }
 
-    /**
-     * Authentication Manager
-     * Nécessaire pour le login
-     */
     @Bean
     public AuthenticationManager authenticationManager(
             AuthenticationConfiguration authConfig) throws Exception {
         return authConfig.getAuthenticationManager();
     }
 
-    /**
-     * Configuration principale de la sécurité
-     * Définit quels endpoints sont publics et lesquels nécessitent une authentification
-     */
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                // Désactiver CSRF (pas nécessaire pour une API REST)
                 .csrf(csrf -> csrf.disable())
 
-                // Configuration des autorisations
                 .authorizeHttpRequests(auth -> auth
-                        //  Endpoints PUBLICS (sans authentification)
-                        .requestMatchers("/api/auth/**").permitAll()           // Login, Register
-                        .requestMatchers("/actuator/**").permitAll()            // Health check
-                        .requestMatchers("/swagger-ui/**", "/api-docs/**").permitAll() // Swagger
+                        //  Endpoints PUBLICS
+                        .requestMatchers("/api/v1/auth/**").permitAll()
+                        .requestMatchers("/actuator/**").permitAll()
+                        .requestMatchers("/swagger-ui/**", "/api-docs/**").permitAll()
 
-                        // Endpoints ADMIN uniquement
-                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                        //  Endpoints ADMIN
+                        .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")  // ← CORRIGÉ ICI
 
-                        //  Tous les autres endpoints nécessitent une authentification
+                        //  Tous les autres endpoints
                         .anyRequest().authenticated()
                 )
 
-                // Pas de sessions (stateless = JWT)
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
 
-                // Configurer le provider d'authentification
                 .authenticationProvider(authenticationProvider())
 
-                // Ajouter notre filtre JWT AVANT le filtre d'authentification Spring
                 .addFilterBefore(jwtAuthenticationFilter,
                         UsernamePasswordAuthenticationFilter.class);
 

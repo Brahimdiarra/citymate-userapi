@@ -9,7 +9,7 @@ import jakarta.ws.rs.ApplicationPath;
 
 /**
  * Configuration Jersey (JAX-RS)
- * Définit le chemin de base de l'API : /api
+ * Définit le chemin de base de l'API : /api/v1
  * Enregistre les Resources
  */
 @Configuration
