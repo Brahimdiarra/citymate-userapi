@@ -57,6 +57,8 @@ public class SecurityConfig {
                         .requestMatchers("/api/v1/auth/**").permitAll()
                         .requestMatchers("/actuator/**").permitAll()
                         .requestMatchers("/swagger-ui/**", "/api-docs/**").permitAll()
+                        .requestMatchers("/webjars/**").permitAll()
+                        .requestMatchers("/api/v1/openapi.json", "/api/v1/openapi.yaml").permitAll()
 
                         //  Endpoints ADMIN
                         .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")  // ← CORRIGÉ ICI

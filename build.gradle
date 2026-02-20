@@ -29,6 +29,8 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-security'
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
 	implementation 'org.springframework.boot:spring-boot-starter-jersey'
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+
 	compileOnly 'org.projectlombok:lombok'
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 
@@ -45,12 +47,18 @@ dependencies {
 	runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.3'
 	runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.3'
 
-	// Swagger pour Jersey
-	implementation 'io.swagger.core.v3:swagger-jaxrs2:2.2.20'
-	implementation 'io.swagger.core.v3:swagger-jaxrs2-servlet-initializer-v2:2.2.20'
+	// Swagger pour Jersey (Jakarta EE 9+ compatible avec Spring Boot 3.x)
+	implementation 'io.swagger.core.v3:swagger-jaxrs2-jakarta:2.2.43'
+
+	// Swagger UI (interface web)
+	implementation 'org.webjars:swagger-ui:5.18.2'
+	implementation 'org.webjars:webjars-locator-core:0.55'
 
 	// Actuator (Health check)
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
+
+	// H2 pour les tests
+	testRuntimeOnly 'com.h2database:h2'
 }
 
 tasks.named('test') {

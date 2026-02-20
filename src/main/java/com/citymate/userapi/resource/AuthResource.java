@@ -4,6 +4,12 @@ import com.citymate.userapi.dto.JwtResponse;
 import com.citymate.userapi.dto.LoginRequest;
 import com.citymate.userapi.dto.RegisterRequest;
 import com.citymate.userapi.service.AuthService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
@@ -13,30 +19,28 @@ import org.springframework.stereotype.Component;
 
 /**
  * Resource JAX-RS pour l'authentification
- * Endpoints :
+ * Endpoints:
  * - POST /api/v1/auth/login
  * - POST /api/v1/auth/register
+ * - GET /api/v1/auth/health
  */
 @Component
 @Path("/auth")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
+@Tag(name = "Authentication", description = "Endpoints pour l'authentification et l'inscription")
 public class AuthResource {
 
     @Autowired
     private AuthService authService;
 
-    /**
-     * Endpoint de connexion
-     * POST /api/v1/auth/login
-     *
-     * Body : { "username": "alice", "password": "password123" }
-     *
-     * @param loginRequest Username et password
-     * @return Token JWT si succès
-     */
     @POST
     @Path("/login")
+    @Operation(summary = "Authentifier un utilisateur", description = "Valide les credentials et retourne un token JWT")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Authentification reussie", content = @Content(mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = JwtResponse.class))),
+            @ApiResponse(responseCode = "401", description = "Credentials invalides")
+    })
     public Response login(@Valid LoginRequest loginRequest) {
         try {
             JwtResponse response = authService.login(loginRequest);
@@ -49,24 +53,13 @@ public class AuthResource {
         }
     }
 
-    /**
-     * Endpoint d'inscription
-     * POST /api/v1/auth/register
-     *
-     * Body : {
-     *   "username": "alice",
-     *   "email": "alice@test.com",
-     *   "password": "password123",
-     *   "firstName": "Alice",
-     *   "lastName": "Doe",
-     *   "profileType": "STUDENT"
-     * }
-     *
-     * @param registerRequest Données d'inscription
-     * @return Token JWT si succès
-     */
     @POST
     @Path("/register")
+    @Operation(summary = "Creer un nouveau compte", description = "Enregistre un nouvel utilisateur et retourne un token JWT")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Inscription reussie", content = @Content(mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = JwtResponse.class))),
+            @ApiResponse(responseCode = "400", description = "Donnees invalides ou utilisateur existant")
+    })
     public Response register(@Valid RegisterRequest registerRequest) {
         try {
             JwtResponse response = authService.register(registerRequest);
@@ -79,13 +72,10 @@ public class AuthResource {
         }
     }
 
-    /**
-     * Endpoint de test (health check)
-     * GET /api/auth/health
-     */
     @GET
     @Path("/health")
+    @Operation(summary = "Health check", description = "Verifie si l'API est operationnelle")
     public Response health() {
-        return Response.ok("USER API is running ✅").build();
+        return Response.ok("USER API is running").build();
     }
 }
