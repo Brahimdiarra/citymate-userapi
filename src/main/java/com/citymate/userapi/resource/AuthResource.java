@@ -44,7 +44,7 @@ public class AuthResource {
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     public Response login(@Valid LoginRequest loginRequest) {
-        // Pas de try-catch ! Les exceptions sont gérées par GlobalExceptionHandler
+
         JwtResponse response = authService.login(loginRequest);
         return Response.ok(response).build();
     }
@@ -58,8 +58,15 @@ public class AuthResource {
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     public Response register(@Valid RegisterRequest registerRequest) {
-        // Pas de try-catch !
+
         JwtResponse response = authService.register(registerRequest);
         return Response.ok(response).build();
+    }
+
+
+    @GET
+    @Path("/health")
+    public Response health() {
+        return Response.ok("USER API is running ").build();
     }
 }

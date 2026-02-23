@@ -46,7 +46,7 @@ public class UserResource {
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     public Response getCurrentUser(@Context SecurityContext securityContext) {
-        // Pas de try-catch !
+
         String username = securityContext.getUserPrincipal().getName();
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "username", username));
@@ -58,7 +58,7 @@ public class UserResource {
     @Path("/{username}")
     @Operation(summary = "Récupérer le profil d'un utilisateur")
     public Response getUserByUsername(@PathParam("username") String username) {
-        // Pas de try-catch !
+
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "username", username));
 
