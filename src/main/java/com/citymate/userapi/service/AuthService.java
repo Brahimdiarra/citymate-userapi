@@ -5,6 +5,8 @@ import com.citymate.userapi.dto.LoginRequest;
 import com.citymate.userapi.dto.RegisterRequest;
 import com.citymate.userapi.entity.Role;
 import com.citymate.userapi.entity.User;
+import com.citymate.userapi.exception.ConflictException;
+import com.citymate.userapi.exception.ResourceNotFoundException;
 import com.citymate.userapi.repository.RoleRepository;
 import com.citymate.userapi.repository.UserRepository;
 import com.citymate.userapi.security.JwtTokenProvider;
@@ -50,7 +52,8 @@ public class AuthService {
      */
     @Transactional
     public JwtResponse login(LoginRequest loginRequest) {
-        // 1. Authentifier l'utilisateur avec Spring Security
+        // Lève BadCredentialsException si incorrect
+        // → Capturé par GlobalExceptionHandler → 401
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         loginRequest.getUsername(),
@@ -58,34 +61,25 @@ public class AuthService {
                 )
         );
 
-        // 2. Stocker l'authentification dans le SecurityContext
         SecurityContextHolder.getContext().setAuthentication(authentication);
-
-        // 3. Générer le JWT token
         String jwt = jwtTokenProvider.generateToken(authentication);
 
-        // 4. Retourner le token au client
         return new JwtResponse(jwt, loginRequest.getUsername());
     }
 
-    /**
-     * Inscription d'un nouvel utilisateur
-     * @param registerRequest Données d'inscription
-     * @return Token JWT
-     */
     @Transactional
     public JwtResponse register(RegisterRequest registerRequest) {
-        // 1. Vérifier si username existe déjà
+        // Vérifier si username existe
         if (userRepository.existsByUsername(registerRequest.getUsername())) {
-            throw new RuntimeException("Erreur : Username déjà utilisé !");
+            throw new ConflictException("Username déjà utilisé");
         }
 
-        // 2. Vérifier si email existe déjà
+        // Vérifier si email existe
         if (userRepository.existsByEmail(registerRequest.getEmail())) {
-            throw new RuntimeException("Erreur : Email déjà utilisé !");
+            throw new ConflictException("Email déjà utilisé");
         }
 
-        // 3. Créer le nouvel utilisateur
+        // Créer l'utilisateur
         User user = new User();
         user.setUsername(registerRequest.getUsername());
         user.setEmail(registerRequest.getEmail());
@@ -96,21 +90,17 @@ public class AuthService {
         user.setIsActive(true);
         user.setIsVerified(false);
 
-        // 4. Assigner le rôle CLIENT par défaut
+        // Assigner le rôle CLIENT
         Role clientRole = roleRepository.findByName("CLIENT")
-                .orElseThrow(() -> new RuntimeException("Erreur : Rôle CLIENT non trouvé dans la base !"));
+                .orElseThrow(() -> new ResourceNotFoundException("Role", "name", "CLIENT"));
 
         Set<Role> roles = new HashSet<>();
         roles.add(clientRole);
         user.setRoles(roles);
 
-        // 5. Sauvegarder l'utilisateur dans la DB
         userRepository.save(user);
 
-        // 6. Générer un JWT token
         String jwt = jwtTokenProvider.generateTokenFromUsername(user.getUsername());
-
-        // 7. Retourner le token
         return new JwtResponse(jwt, user.getUsername());
     }
 }

@@ -1,5 +1,6 @@
 package com.citymate.userapi.resource;
 
+import com.citymate.userapi.dto.ErrorResponse;
 import com.citymate.userapi.dto.JwtResponse;
 import com.citymate.userapi.dto.LoginRequest;
 import com.citymate.userapi.dto.RegisterRequest;
@@ -36,46 +37,29 @@ public class AuthResource {
 
     @POST
     @Path("/login")
-    @Operation(summary = "Authentifier un utilisateur", description = "Valide les credentials et retourne un token JWT")
+    @Operation(summary = "Authentifier un utilisateur")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Authentification reussie", content = @Content(mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = JwtResponse.class))),
-            @ApiResponse(responseCode = "401", description = "Credentials invalides")
+            @ApiResponse(responseCode = "200", description = "Authentification réussie"),
+            @ApiResponse(responseCode = "401", description = "Credentials invalides",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     public Response login(@Valid LoginRequest loginRequest) {
-        try {
-            JwtResponse response = authService.login(loginRequest);
-            return Response.ok(response).build();
-        } catch (Exception e) {
-            return Response
-                    .status(Response.Status.UNAUTHORIZED)
-                    .entity("Erreur : Username ou mot de passe incorrect")
-                    .build();
-        }
+        // Pas de try-catch ! Les exceptions sont gérées par GlobalExceptionHandler
+        JwtResponse response = authService.login(loginRequest);
+        return Response.ok(response).build();
     }
 
     @POST
     @Path("/register")
-    @Operation(summary = "Creer un nouveau compte", description = "Enregistre un nouvel utilisateur et retourne un token JWT")
+    @Operation(summary = "Créer un nouveau compte")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Inscription reussie", content = @Content(mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = JwtResponse.class))),
-            @ApiResponse(responseCode = "400", description = "Donnees invalides ou utilisateur existant")
+            @ApiResponse(responseCode = "200", description = "Inscription réussie"),
+            @ApiResponse(responseCode = "409", description = "Username ou email déjà utilisé",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     public Response register(@Valid RegisterRequest registerRequest) {
-        try {
-            JwtResponse response = authService.register(registerRequest);
-            return Response.ok(response).build();
-        } catch (RuntimeException e) {
-            return Response
-                    .status(Response.Status.BAD_REQUEST)
-                    .entity(e.getMessage())
-                    .build();
-        }
-    }
-
-    @GET
-    @Path("/health")
-    @Operation(summary = "Health check", description = "Verifie si l'API est operationnelle")
-    public Response health() {
-        return Response.ok("USER API is running").build();
+        // Pas de try-catch !
+        JwtResponse response = authService.register(registerRequest);
+        return Response.ok(response).build();
     }
 }

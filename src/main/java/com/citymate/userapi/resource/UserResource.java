@@ -1,7 +1,9 @@
 package com.citymate.userapi.resource;
 
+import com.citymate.userapi.dto.ErrorResponse;
 import com.citymate.userapi.dto.UserDTO;
 import com.citymate.userapi.entity.User;
+import com.citymate.userapi.exception.ResourceNotFoundException;
 import com.citymate.userapi.repository.UserRepository;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -37,46 +39,29 @@ public class UserResource {
 
     @GET
     @Path("/me")
-    @Operation(summary = "Recuperer mon profil", description = "Retourne les informations du profil de l'utilisateur authentifie")
+    @Operation(summary = "Récupérer mon profil")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Profil trouve", content = @Content(mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = UserDTO.class))),
-            @ApiResponse(responseCode = "401", description = "Authentification requise"),
-            @ApiResponse(responseCode = "404", description = "Utilisateur non trouve")
+            @ApiResponse(responseCode = "200", description = "Profil trouvé"),
+            @ApiResponse(responseCode = "404", description = "Utilisateur non trouvé",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     public Response getCurrentUser(@Context SecurityContext securityContext) {
-        try {
-            String username = securityContext.getUserPrincipal().getName();
-            User user = userRepository.findByUsername(username)
-                    .orElseThrow(() -> new NotFoundException("User not found"));
-            UserDTO userDTO = new UserDTO(user);
-            return Response.ok(userDTO).build();
-        } catch (NotFoundException e) {
-            return Response
-                    .status(Response.Status.NOT_FOUND)
-                    .entity("Utilisateur non trouve")
-                    .build();
-        }
+        // Pas de try-catch !
+        String username = securityContext.getUserPrincipal().getName();
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new ResourceNotFoundException("User", "username", username));
+
+        return Response.ok(new UserDTO(user)).build();
     }
 
     @GET
     @Path("/{username}")
-    @Operation(summary = "Recuperer le profil d'un utilisateur", description = "Retourne les informations publiques d'un utilisateur par son username")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Profil trouve", content = @Content(mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = UserDTO.class))),
-            @ApiResponse(responseCode = "401", description = "Authentification requise"),
-            @ApiResponse(responseCode = "404", description = "Utilisateur non trouve")
-    })
+    @Operation(summary = "Récupérer le profil d'un utilisateur")
     public Response getUserByUsername(@PathParam("username") String username) {
-        try {
-            User user = userRepository.findByUsername(username)
-                    .orElseThrow(() -> new NotFoundException("User not found"));
-            UserDTO userDTO = new UserDTO(user);
-            return Response.ok(userDTO).build();
-        } catch (NotFoundException e) {
-            return Response
-                    .status(Response.Status.NOT_FOUND)
-                    .entity("Utilisateur non trouve")
-                    .build();
-        }
+        // Pas de try-catch !
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new ResourceNotFoundException("User", "username", username));
+
+        return Response.ok(new UserDTO(user)).build();
     }
 }

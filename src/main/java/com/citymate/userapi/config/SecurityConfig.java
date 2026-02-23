@@ -59,9 +59,10 @@ public class SecurityConfig {
                         .requestMatchers("/swagger-ui/**", "/api-docs/**").permitAll()
                         .requestMatchers("/webjars/**").permitAll()
                         .requestMatchers("/api/v1/openapi.json", "/api/v1/openapi.yaml").permitAll()
+                        .requestMatchers("/swagger-ui.html").permitAll()
 
                         //  Endpoints ADMIN
-                        .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")  // ← CORRIGÉ ICI
+                        .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
 
                         //  Tous les autres endpoints
                         .anyRequest().authenticated()

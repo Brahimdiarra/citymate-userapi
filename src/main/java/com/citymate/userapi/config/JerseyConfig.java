@@ -1,5 +1,6 @@
 package com.citymate.userapi.config;
 
+import com.citymate.userapi.exception.GlobalExceptionHandler;
 import com.citymate.userapi.resource.AuthResource;
 import com.citymate.userapi.resource.UserResource;
 import io.swagger.v3.jaxrs2.integration.resources.OpenApiResource;
@@ -31,8 +32,10 @@ public class JerseyConfig extends ResourceConfig {
         register(AuthResource.class);
         register(UserResource.class);
 
-        // Swagger OpenAPI endpoint : GET /api/v1/openapi.json
-        // Enregistré séparément pour ne pas être documenté dans la spec
+        // Swagger OpenAPI
         register(OpenApiResource.class);
+
+        // ✅ Enregistrer le gestionnaire d'exceptions global
+        register(GlobalExceptionHandler.class);
     }
 }
