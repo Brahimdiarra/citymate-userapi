@@ -24,7 +24,7 @@ import java.io.IOException;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     @Autowired
-    private JwtTokenProvider jwtTokenProvider;
+    private JwtUtil jwtUtil;
 
     @Autowired
     private UserDetailsService userDetailsService;
@@ -40,15 +40,22 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             String jwt = getJwtFromRequest(request);
 
             // 2. Vérifier si le token est présent et valide
-            if (StringUtils.hasText(jwt) && jwtTokenProvider.validateToken(jwt)) {
+            if (StringUtils.hasText(jwt) && jwtUtil.validateToken(jwt)) {
 
-                // 3. Extraire le username depuis le token
-                String username = jwtTokenProvider.getUsernameFromToken(jwt);
+                // 3. Vérifier que c'est bien un ACCESS TOKEN (pas un refresh token)
+                if (!jwtUtil.isAccessToken(jwt)) {
+                    logger.error("Token is not an access token");
+                    filterChain.doFilter(request, response);
+                    return;
+                }
 
-                // 4. Charger les détails de l'utilisateur depuis la DB
+                // 4. Extraire le username depuis le token
+                String username = jwtUtil.extractUsername(jwt);
+
+                // 5. Charger les détails de l'utilisateur depuis la DB
                 UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
-                // 5. Créer l'objet d'authentification Spring Security
+                // 6. Créer l'objet d'authentification Spring Security
                 UsernamePasswordAuthenticationToken authentication =
                         new UsernamePasswordAuthenticationToken(
                                 userDetails,
@@ -60,14 +67,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                         new WebAuthenticationDetailsSource().buildDetails(request)
                 );
 
-                // 6. Configurer Spring Security avec cette authentification
+                // 7. Configurer Spring Security avec cette authentification
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }
         } catch (Exception e) {
             logger.error("Erreur lors de l'authentification JWT: " + e.getMessage());
         }
 
-        // 7. Continuer la chaîne de filtres
+        // 8. Continuer la chaîne de filtres
         filterChain.doFilter(request, response);
     }
 
@@ -80,7 +87,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         // Vérifier le format "Bearer <token>"
         if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
-            return bearerToken.substring(7); // Enlever "Bearer "
+            return bearerToken.substring(7);
         }
 
         return null;

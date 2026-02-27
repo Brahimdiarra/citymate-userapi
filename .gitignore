@@ -30,3 +30,5 @@ logs/
 
 # Application properties avec mots de passe
 # application-local.properties
+
+.env
