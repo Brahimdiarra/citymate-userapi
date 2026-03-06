@@ -7,6 +7,7 @@ import com.citymate.userapi.entity.Role;
 import com.citymate.userapi.entity.User;
 import com.citymate.userapi.exception.ConflictException;
 import com.citymate.userapi.exception.ResourceNotFoundException;
+import com.citymate.userapi.mapper.UserMapper;
 import com.citymate.userapi.repository.RoleRepository;
 import com.citymate.userapi.repository.UserRepository;
 import com.citymate.userapi.security.JwtTokenProvider;
@@ -52,8 +53,6 @@ public class AuthService {
      */
     @Transactional
     public JwtResponse login(LoginRequest loginRequest) {
-        // Lève BadCredentialsException si incorrect
-        // → Capturé par GlobalExceptionHandler → 401
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         loginRequest.getUsername(),
@@ -67,6 +66,11 @@ public class AuthService {
         return new JwtResponse(jwt, loginRequest.getUsername());
     }
 
+    /**
+     * Inscription d'un nouvel utilisateur
+     * @param registerRequest Données d'inscription
+     * @return Token JWT
+     */
     @Transactional
     public JwtResponse register(RegisterRequest registerRequest) {
         // Vérifier si username existe
@@ -79,18 +83,13 @@ public class AuthService {
             throw new ConflictException("Email déjà utilisé");
         }
 
-        // Créer l'utilisateur
-        User user = new User();
-        user.setUsername(registerRequest.getUsername());
-        user.setEmail(registerRequest.getEmail());
-        user.setPasswordHash(passwordEncoder.encode(registerRequest.getPassword()));
-        user.setFirstName(registerRequest.getFirstName());
-        user.setLastName(registerRequest.getLastName());
-        user.setProfileType(registerRequest.getProfileType());
-        user.setIsActive(true);
-        user.setIsVerified(false);
 
-        // Assigner le rôle CLIENT
+        User user = UserMapper.toEntity(registerRequest);
+
+
+        user.setPasswordHash(passwordEncoder.encode(registerRequest.getPassword()));
+
+
         Role clientRole = roleRepository.findByName("CLIENT")
                 .orElseThrow(() -> new ResourceNotFoundException("Role", "name", "CLIENT"));
 
@@ -98,8 +97,10 @@ public class AuthService {
         roles.add(clientRole);
         user.setRoles(roles);
 
+        // Sauvegarder
         userRepository.save(user);
 
+        // Générer token
         String jwt = jwtTokenProvider.generateTokenFromUsername(user.getUsername());
         return new JwtResponse(jwt, user.getUsername());
     }
