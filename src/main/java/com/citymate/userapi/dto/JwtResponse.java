@@ -13,17 +13,17 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class JwtResponse {
 
-    private String token;
+    private String accessToken;
+
+    private String refreshToken;
 
     private String type = "Bearer";
 
     private String username;
 
-    /**
-     * Constructeur sans le type (par défaut "Bearer")
-     */
-    public JwtResponse(String token, String username) {
-        this.token = token;
+    public JwtResponse(String accessToken, String refreshToken, String username) {
+        this.accessToken = accessToken;
+        this.refreshToken = refreshToken;
         this.type = "Bearer";
         this.username = username;
     }

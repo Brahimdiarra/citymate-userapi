@@ -3,6 +3,7 @@ package com.citymate.userapi.resource;
 import com.citymate.userapi.dto.ErrorResponse;
 import com.citymate.userapi.dto.JwtResponse;
 import com.citymate.userapi.dto.LoginRequest;
+import com.citymate.userapi.dto.RefreshTokenRequest;
 import com.citymate.userapi.dto.RegisterRequest;
 import com.citymate.userapi.service.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -63,6 +64,19 @@ public class AuthResource {
         return Response.ok(response).build();
     }
 
+
+    @POST
+    @Path("/refresh")
+    @Operation(summary = "Renouveler l'access token via le refresh token")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Nouveau access token généré"),
+            @ApiResponse(responseCode = "401", description = "Refresh token invalide ou expiré",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    public Response refresh(@Valid RefreshTokenRequest refreshTokenRequest) {
+        JwtResponse response = authService.refresh(refreshTokenRequest.getRefreshToken());
+        return Response.ok(response).build();
+    }
 
     @GET
     @Path("/health")

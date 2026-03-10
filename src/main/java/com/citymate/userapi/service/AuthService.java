@@ -7,6 +7,7 @@ import com.citymate.userapi.entity.Role;
 import com.citymate.userapi.entity.User;
 import com.citymate.userapi.exception.ConflictException;
 import com.citymate.userapi.exception.ResourceNotFoundException;
+import com.citymate.userapi.exception.UnauthorizedException;
 import com.citymate.userapi.mapper.UserMapper;
 import com.citymate.userapi.repository.RoleRepository;
 import com.citymate.userapi.repository.UserRepository;
@@ -61,9 +62,10 @@ public class AuthService {
         );
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        String jwt = jwtUtil.generateAccessToken(loginRequest.getUsername());
+        String accessToken = jwtUtil.generateAccessToken(loginRequest.getUsername());
+        String refreshToken = jwtUtil.generateRefreshToken(loginRequest.getUsername());
 
-        return new JwtResponse(jwt, loginRequest.getUsername());
+        return new JwtResponse(accessToken, refreshToken, loginRequest.getUsername());
     }
 
     /**
@@ -100,8 +102,38 @@ public class AuthService {
         // Sauvegarder
         userRepository.save(user);
 
-        // Générer token
-        String jwt = jwtUtil.generateAccessToken(user.getUsername());
-        return new JwtResponse(jwt, user.getUsername());
+        // Générer tokens
+        String accessToken = jwtUtil.generateAccessToken(user.getUsername());
+        String refreshToken = jwtUtil.generateRefreshToken(user.getUsername());
+        return new JwtResponse(accessToken, refreshToken, user.getUsername());
+    }
+
+    /**
+     * Renouvellement d'un access token via un refresh token valide
+     * @param refreshToken Le refresh token (24h) envoyé par le client
+     * @return Nouveau JwtResponse avec un nouvel access token
+     */
+    public JwtResponse refresh(String refreshToken) {
+        // Vérifier que c'est bien un refresh token (type = "refresh")
+        if (!jwtUtil.isRefreshToken(refreshToken)) {
+            throw new UnauthorizedException("Token fourni n'est pas un refresh token");
+        }
+
+        // Vérifier que le refresh token est valide et non expiré
+        if (!jwtUtil.validateToken(refreshToken)) {
+            throw new UnauthorizedException("Refresh token invalide ou expiré");
+        }
+
+        // Extraire le username du refresh token
+        String username = jwtUtil.extractUsername(refreshToken);
+
+        // Vérifier que l'utilisateur existe toujours en base
+        userRepository.findByUsername(username)
+                .orElseThrow(() -> new ResourceNotFoundException("User", "username", username));
+
+        // Générer un nouvel access token
+        String newAccessToken = jwtUtil.generateAccessToken(username);
+
+        return new JwtResponse(newAccessToken, refreshToken, username);
     }
 }
