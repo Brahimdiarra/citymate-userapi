@@ -107,11 +107,11 @@ public class AuthService {
         user.setPasswordHash(passwordEncoder.encode(registerRequest.getPassword()));
 
 
-        Role clientRole = roleRepository.findByName("CLIENT")
-                .orElseThrow(() -> new ResourceNotFoundException("Role", "name", "CLIENT"));
+        Role studentRole = roleRepository.findByName("STUDENT")
+                .orElseThrow(() -> new ResourceNotFoundException("Role", "name", "STUDENT"));
 
         Set<Role> roles = new HashSet<>();
-        roles.add(clientRole);
+        roles.add(studentRole);
         user.setRoles(roles);
 
         // Sauvegarder — le try/catch gère la race condition :
@@ -131,10 +131,10 @@ public class AuthService {
         }
 
         // Générer tokens
-        String accessToken = jwtUtil.generateAccessToken(user.getUsername(), "CLIENT");
+        String accessToken = jwtUtil.generateAccessToken(user.getUsername(), "STUDENT");
         String refreshToken = jwtUtil.generateRefreshToken(user.getUsername());
         JwtResponse response = new JwtResponse(accessToken, refreshToken, user.getUsername());
-        response.setRole("CLIENT");
+        response.setRole("STUDENT");
         return response;
     }
 

@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 
 /**
  * Initialise les données de base au démarrage de l'application
- * - Crée les rôles (VISITOR, CLIENT, ADMIN) s'ils n'existent pas
+ * - Crée les rôles (VISITOR, CLIENT, ADMIN, STUDENT) s'ils n'existent pas
  */
 @Component
 public class DataInitializer implements CommandLineRunner {
@@ -43,6 +43,13 @@ public class DataInitializer implements CommandLineRunner {
             log.info("Rôle ADMIN créé");
         } else {
             log.debug("Rôle ADMIN existe déjà");
+        }
+
+        if (!roleRepository.existsByName("STUDENT")) {
+            roleRepository.save(new Role("STUDENT", "Étudiant inscrit sur CityMate"));
+            log.info("Rôle STUDENT créé");
+        } else {
+            log.debug("Rôle STUDENT existe déjà");
         }
 
         log.info("Initialisation terminée !");
