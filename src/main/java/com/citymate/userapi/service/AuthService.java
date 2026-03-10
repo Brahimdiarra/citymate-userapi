@@ -10,7 +10,7 @@ import com.citymate.userapi.exception.ResourceNotFoundException;
 import com.citymate.userapi.mapper.UserMapper;
 import com.citymate.userapi.repository.RoleRepository;
 import com.citymate.userapi.repository.UserRepository;
-import com.citymate.userapi.security.JwtTokenProvider;
+import com.citymate.userapi.security.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -44,7 +44,7 @@ public class AuthService {
     private PasswordEncoder passwordEncoder;
 
     @Autowired
-    private JwtTokenProvider jwtTokenProvider;
+    private JwtUtil jwtUtil;
 
     /**
      * Connexion d'un utilisateur
@@ -61,7 +61,7 @@ public class AuthService {
         );
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        String jwt = jwtTokenProvider.generateToken(authentication);
+        String jwt = jwtUtil.generateAccessToken(loginRequest.getUsername());
 
         return new JwtResponse(jwt, loginRequest.getUsername());
     }
@@ -101,7 +101,7 @@ public class AuthService {
         userRepository.save(user);
 
         // Générer token
-        String jwt = jwtTokenProvider.generateTokenFromUsername(user.getUsername());
+        String jwt = jwtUtil.generateAccessToken(user.getUsername());
         return new JwtResponse(jwt, user.getUsername());
     }
 }
