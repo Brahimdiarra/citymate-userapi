@@ -2,6 +2,8 @@ package com.citymate.userapi.security;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -16,6 +18,8 @@ import java.util.Date;
  */
 @Component
 public class JwtTokenProvider {
+
+    private static final Logger log = LoggerFactory.getLogger(JwtTokenProvider.class);
 
     @Value("${jwt.secret}")
     private String jwtSecret;
@@ -85,15 +89,15 @@ public class JwtTokenProvider {
 
             return true;
         } catch (SecurityException e) {
-            System.err.println("Signature JWT invalide: " + e.getMessage());
+            log.warn("Signature JWT invalide: {}", e.getMessage());
         } catch (MalformedJwtException e) {
-            System.err.println("Token JWT mal formé: " + e.getMessage());
+            log.warn("Token JWT mal formé: {}", e.getMessage());
         } catch (ExpiredJwtException e) {
-            System.err.println("Token JWT expiré: " + e.getMessage());
+            log.warn("Token JWT expiré: {}", e.getMessage());
         } catch (UnsupportedJwtException e) {
-            System.err.println("Token JWT non supporté: " + e.getMessage());
+            log.warn("Token JWT non supporté: {}", e.getMessage());
         } catch (IllegalArgumentException e) {
-            System.err.println("JWT claims vide: " + e.getMessage());
+            log.warn("JWT claims vide: {}", e.getMessage());
         }
         return false;
     }

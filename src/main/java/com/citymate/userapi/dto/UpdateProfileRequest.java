@@ -1,6 +1,7 @@
 package com.citymate.userapi.dto;
 
 import com.citymate.userapi.entity.User;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -29,5 +30,10 @@ public class UpdateProfileRequest {
 
     private User.ProfileType profileType;
 
+    @Size(max = 2048, message = "URL trop longue")
+    @Pattern(
+        regexp = "^(https?://.*)?$",
+        message = "profilePictureUrl doit être une URL valide (http ou https)"
+    )
     private String profilePictureUrl;
 }

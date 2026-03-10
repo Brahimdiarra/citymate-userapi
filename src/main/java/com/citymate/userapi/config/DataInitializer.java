@@ -2,6 +2,8 @@ package com.citymate.userapi.config;
 
 import com.citymate.userapi.entity.Role;
 import com.citymate.userapi.repository.RoleRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
@@ -13,40 +15,36 @@ import org.springframework.stereotype.Component;
 @Component
 public class DataInitializer implements CommandLineRunner {
 
+    private static final Logger log = LoggerFactory.getLogger(DataInitializer.class);
+
     @Autowired
     private RoleRepository roleRepository;
 
     @Override
     public void run(String... args) throws Exception {
-        System.out.println(" Initialisation des données...");
+        log.info("Initialisation des données...");
 
-        // Créer le rôle VISITOR s'il n'existe pas
         if (!roleRepository.existsByName("VISITOR")) {
-            Role visitorRole = new Role("VISITOR", "Utilisateur non inscrit avec accès limité");
-            roleRepository.save(visitorRole);
-            System.out.println(" Rôle VISITOR créé");
+            roleRepository.save(new Role("VISITOR", "Utilisateur non inscrit avec accès limité"));
+            log.info("Rôle VISITOR créé");
         } else {
-            System.out.println(" Rôle VISITOR existe déjà");
+            log.debug("Rôle VISITOR existe déjà");
         }
 
-        // Créer le rôle CLIENT s'il n'existe pas
         if (!roleRepository.existsByName("CLIENT")) {
-            Role clientRole = new Role("CLIENT", "Utilisateur inscrit standard");
-            roleRepository.save(clientRole);
-            System.out.println(" Rôle CLIENT créé");
+            roleRepository.save(new Role("CLIENT", "Utilisateur inscrit standard"));
+            log.info("Rôle CLIENT créé");
         } else {
-            System.out.println(" Rôle CLIENT existe déjà");
+            log.debug("Rôle CLIENT existe déjà");
         }
 
-        // Créer le rôle ADMIN s'il n'existe pas
         if (!roleRepository.existsByName("ADMIN")) {
-            Role adminRole = new Role("ADMIN", "Administrateur avec tous les droits");
-            roleRepository.save(adminRole);
-            System.out.println("Rôle ADMIN créé");
+            roleRepository.save(new Role("ADMIN", "Administrateur avec tous les droits"));
+            log.info("Rôle ADMIN créé");
         } else {
-            System.out.println("  Rôle ADMIN existe déjà");
+            log.debug("Rôle ADMIN existe déjà");
         }
 
-        System.out.println("Initialisation terminée !\n");
+        log.info("Initialisation terminée !");
     }
 }
