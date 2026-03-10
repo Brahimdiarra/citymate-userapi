@@ -1,5 +1,6 @@
 package com.citymate.userapi.service;
 
+import com.citymate.userapi.dto.PublicUserDTO;
 import com.citymate.userapi.dto.UpdateProfileRequest;
 import com.citymate.userapi.dto.UserDTO;
 import com.citymate.userapi.entity.User;
@@ -20,13 +21,24 @@ public class UserService {
     private UserRepository userRepository;
 
     /**
-     * Récupérer un utilisateur par username
+     * Récupérer son propre profil complet (données privées incluses)
      */
     public UserDTO getUserByUsername(String username) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "username", username));
 
         return UserMapper.toDTO(user);
+    }
+
+    /**
+     * Récupérer le profil public d'un autre utilisateur (données limitées)
+     * Ne retourne que les champs visibles publiquement
+     */
+    public PublicUserDTO getPublicUserByUsername(String username) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new ResourceNotFoundException("User", "username", username));
+
+        return new PublicUserDTO(user);
     }
 
     /**

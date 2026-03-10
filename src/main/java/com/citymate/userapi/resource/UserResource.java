@@ -1,6 +1,7 @@
 package com.citymate.userapi.resource;
 
 import com.citymate.userapi.dto.ErrorResponse;
+import com.citymate.userapi.dto.PublicUserDTO;
 import com.citymate.userapi.dto.UpdateProfileRequest;
 import com.citymate.userapi.dto.UserDTO;
 import com.citymate.userapi.exception.UnauthorizedException;
@@ -58,10 +59,24 @@ public class UserResource {
 
     @GET
     @Path("/{username}")
-    @Operation(summary = "Récupérer le profil d'un utilisateur")
-    public Response getUserByUsername(@PathParam("username") String username) {
-        UserDTO userDTO = userService.getUserByUsername(username);
-        return Response.ok(userDTO).build();
+    @Operation(summary = "Récupérer le profil public d'un utilisateur")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Profil public trouvé"),
+            @ApiResponse(responseCode = "401", description = "Non authentifié",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "404", description = "Utilisateur non trouvé",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    public Response getUserByUsername(
+            @Context SecurityContext securityContext,
+            @PathParam("username") String username) {
+
+        if (securityContext.getUserPrincipal() == null) {
+            throw new UnauthorizedException("Utilisateur non authentifié");
+        }
+
+        PublicUserDTO publicUserDTO = userService.getPublicUserByUsername(username);
+        return Response.ok(publicUserDTO).build();
     }
 
     @PUT
