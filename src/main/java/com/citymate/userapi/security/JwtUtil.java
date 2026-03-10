@@ -44,6 +44,27 @@ public class JwtUtil {
     }
 
     /**
+     * Génère un ACCESS TOKEN avec le rôle (15 min)
+     */
+    public String generateAccessToken(String username, String role) {
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("type", "access");
+        claims.put("role", role);
+        return createToken(claims, username, accessTokenExpiration);
+    }
+
+    /**
+     * Extrait le rôle d'un token
+     */
+    public String extractRole(String token) {
+        try {
+            return extractClaim(token, claims -> claims.get("role", String.class));
+        } catch (JwtException | IllegalArgumentException e) {
+            return null;
+        }
+    }
+
+    /**
      * Génère un REFRESH TOKEN (24h)
      */
     public String generateRefreshToken(String username) {

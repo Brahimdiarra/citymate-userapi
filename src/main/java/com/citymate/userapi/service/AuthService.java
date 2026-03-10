@@ -63,10 +63,20 @@ public class AuthService {
         );
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        String accessToken = jwtUtil.generateAccessToken(loginRequest.getUsername());
+
+        User user = userRepository.findByUsername(loginRequest.getUsername())
+                .orElseThrow(() -> new UnauthorizedException("Utilisateur introuvable"));
+        String role = user.getRoles().stream()
+                .map(Role::getName)
+                .findFirst()
+                .orElse("CLIENT");
+
+        String accessToken = jwtUtil.generateAccessToken(loginRequest.getUsername(), role);
         String refreshToken = jwtUtil.generateRefreshToken(loginRequest.getUsername());
 
-        return new JwtResponse(accessToken, refreshToken, loginRequest.getUsername());
+        JwtResponse response = new JwtResponse(accessToken, refreshToken, loginRequest.getUsername());
+        response.setRole(role);
+        return response;
     }
 
     /**
@@ -117,9 +127,11 @@ public class AuthService {
         }
 
         // Générer tokens
-        String accessToken = jwtUtil.generateAccessToken(user.getUsername());
+        String accessToken = jwtUtil.generateAccessToken(user.getUsername(), "CLIENT");
         String refreshToken = jwtUtil.generateRefreshToken(user.getUsername());
-        return new JwtResponse(accessToken, refreshToken, user.getUsername());
+        JwtResponse response = new JwtResponse(accessToken, refreshToken, user.getUsername());
+        response.setRole("CLIENT");
+        return response;
     }
 
     /**
@@ -142,12 +154,18 @@ public class AuthService {
         String username = jwtUtil.extractUsername(refreshToken);
 
         // Vérifier que l'utilisateur existe toujours en base
-        userRepository.findByUsername(username)
+        User existingUser = userRepository.findByUsername(username)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "username", username));
+        String role = existingUser.getRoles().stream()
+                .map(Role::getName)
+                .findFirst()
+                .orElse("CLIENT");
 
-        // Générer un nouvel access token
-        String newAccessToken = jwtUtil.generateAccessToken(username);
+        // Générer un nouvel access token avec le rôle
+        String newAccessToken = jwtUtil.generateAccessToken(username, role);
 
-        return new JwtResponse(newAccessToken, refreshToken, username);
+        JwtResponse response = new JwtResponse(newAccessToken, refreshToken, username);
+        response.setRole(role);
+        return response;
     }
 }
