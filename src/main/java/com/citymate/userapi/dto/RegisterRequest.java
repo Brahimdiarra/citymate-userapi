@@ -3,6 +3,7 @@ package com.citymate.userapi.dto;
 import com.citymate.userapi.entity.User;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -26,7 +27,11 @@ public class RegisterRequest {
     private String email;
 
     @NotBlank(message = "Password est obligatoire")
-    @Size(min = 6, message = "Password doit contenir au moins 6 caractères")
+    @Size(min = 8, message = "Password doit contenir au moins 8 caractères")
+    @Pattern(
+        regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&_.#\\-])[A-Za-z\\d@$!%*?&_.#\\-]{8,}$",
+        message = "Password doit contenir au moins : 1 majuscule, 1 minuscule, 1 chiffre, 1 caractère spécial (@$!%*?&_.#-)"
+    )
     private String password;
 
     private String firstName;

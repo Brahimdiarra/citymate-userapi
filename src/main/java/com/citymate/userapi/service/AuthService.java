@@ -13,6 +13,7 @@ import com.citymate.userapi.repository.RoleRepository;
 import com.citymate.userapi.repository.UserRepository;
 import com.citymate.userapi.security.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -99,8 +100,21 @@ public class AuthService {
         roles.add(clientRole);
         user.setRoles(roles);
 
-        // Sauvegarder
-        userRepository.save(user);
+        // Sauvegarder — le try/catch gère la race condition :
+        // deux requêtes simultanées peuvent passer les checks ci-dessus
+        // mais la contrainte UNIQUE PostgreSQL rejettera la seconde insertion
+        try {
+            userRepository.save(user);
+        } catch (DataIntegrityViolationException e) {
+            // Déterminer quel champ est en doublon via le message de l'exception
+            String msg = e.getMessage() != null ? e.getMessage().toLowerCase() : "";
+            if (msg.contains("email")) {
+                throw new ConflictException("Email déjà utilisé");
+            } else if (msg.contains("username")) {
+                throw new ConflictException("Username déjà utilisé");
+            }
+            throw new ConflictException("Username ou email déjà utilisé");
+        }
 
         // Générer tokens
         String accessToken = jwtUtil.generateAccessToken(user.getUsername());
