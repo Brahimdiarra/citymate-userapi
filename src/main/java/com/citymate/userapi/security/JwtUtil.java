@@ -1,8 +1,13 @@
 package com.citymate.userapi.security;
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.MalformedJwtException;
+import io.jsonwebtoken.UnsupportedJwtException;
 import io.jsonwebtoken.security.Keys;
+import io.jsonwebtoken.security.SecurityException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -73,7 +78,13 @@ public class JwtUtil {
         try {
             final String tokenUsername = extractUsername(token);
             return (tokenUsername.equals(username) && !isTokenExpired(token));
-        } catch (Exception e) {
+        } catch (ExpiredJwtException e) {
+            return false;
+        } catch (SecurityException | MalformedJwtException e) {
+            return false;
+        } catch (UnsupportedJwtException e) {
+            return false;
+        } catch (IllegalArgumentException e) {
             return false;
         }
     }
@@ -85,7 +96,13 @@ public class JwtUtil {
         try {
             extractAllClaims(token);
             return !isTokenExpired(token);
-        } catch (Exception e) {
+        } catch (ExpiredJwtException e) {
+            return false;
+        } catch (SecurityException | MalformedJwtException e) {
+            return false;
+        } catch (UnsupportedJwtException e) {
+            return false;
+        } catch (IllegalArgumentException e) {
             return false;
         }
     }
@@ -97,7 +114,7 @@ public class JwtUtil {
         try {
             String type = extractClaim(token, claims -> claims.get("type", String.class));
             return "access".equals(type);
-        } catch (Exception e) {
+        } catch (JwtException | IllegalArgumentException e) {
             return false;
         }
     }
@@ -109,7 +126,7 @@ public class JwtUtil {
         try {
             String type = extractClaim(token, claims -> claims.get("type", String.class));
             return "refresh".equals(type);
-        } catch (Exception e) {
+        } catch (JwtException | IllegalArgumentException e) {
             return false;
         }
     }
