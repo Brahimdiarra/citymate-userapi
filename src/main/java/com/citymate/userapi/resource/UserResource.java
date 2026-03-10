@@ -3,6 +3,7 @@ package com.citymate.userapi.resource;
 import com.citymate.userapi.dto.ErrorResponse;
 import com.citymate.userapi.dto.UpdateProfileRequest;
 import com.citymate.userapi.dto.UserDTO;
+import com.citymate.userapi.exception.UnauthorizedException;
 import com.citymate.userapi.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -47,6 +48,9 @@ public class UserResource {
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     public Response getCurrentUser(@Context SecurityContext securityContext) {
+        if (securityContext.getUserPrincipal() == null) {
+            throw new UnauthorizedException("Utilisateur non authentifié");
+        }
         String username = securityContext.getUserPrincipal().getName();
         UserDTO userDTO = userService.getUserByUsername(username);
         return Response.ok(userDTO).build();
@@ -71,6 +75,9 @@ public class UserResource {
             @Context SecurityContext securityContext,
             @Valid UpdateProfileRequest request) {
 
+        if (securityContext.getUserPrincipal() == null) {
+            throw new UnauthorizedException("Utilisateur non authentifié");
+        }
         String username = securityContext.getUserPrincipal().getName();
         UserDTO userDTO = userService.updateProfile(username, request);
         return Response.ok(userDTO).build();

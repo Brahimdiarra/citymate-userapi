@@ -54,9 +54,18 @@ public class GlobalExceptionHandler implements ExceptionMapper<Exception> {
                     getPath()
             );
         }
-        // UnauthorizedException ou BadCredentialsException → 401
-        else if (exception instanceof UnauthorizedException ||
-                exception instanceof BadCredentialsException) {
+        // UnauthorizedException → 401 (message de l'exception)
+        else if (exception instanceof UnauthorizedException) {
+            status = Response.Status.UNAUTHORIZED;
+            errorResponse = new ErrorResponse(
+                    status.getStatusCode(),
+                    "Unauthorized",
+                    exception.getMessage(),
+                    getPath()
+            );
+        }
+        // BadCredentialsException → 401 (mauvais identifiants)
+        else if (exception instanceof BadCredentialsException) {
             status = Response.Status.UNAUTHORIZED;
             errorResponse = new ErrorResponse(
                     status.getStatusCode(),

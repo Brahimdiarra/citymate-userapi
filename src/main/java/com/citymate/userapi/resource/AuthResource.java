@@ -54,14 +54,14 @@ public class AuthResource {
     @Path("/register")
     @Operation(summary = "Créer un nouveau compte")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Inscription réussie"),
+            @ApiResponse(responseCode = "201", description = "Compte créé avec succès"),
             @ApiResponse(responseCode = "409", description = "Username ou email déjà utilisé",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     public Response register(@Valid RegisterRequest registerRequest) {
 
         JwtResponse response = authService.register(registerRequest);
-        return Response.ok(response).build();
+        return Response.status(Response.Status.CREATED).entity(response).build();
     }
 
 
