@@ -22,6 +22,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -70,6 +71,9 @@ public class AuthService {
                 .map(Role::getName)
                 .findFirst()
                 .orElse("CLIENT");
+
+        user.setLastLogin(LocalDateTime.now());
+        userRepository.save(user);
 
         String accessToken = jwtUtil.generateAccessToken(loginRequest.getUsername(), role);
         String refreshToken = jwtUtil.generateRefreshToken(loginRequest.getUsername());

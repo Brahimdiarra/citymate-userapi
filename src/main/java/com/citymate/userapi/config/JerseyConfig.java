@@ -1,6 +1,7 @@
 package com.citymate.userapi.config;
 
 import com.citymate.userapi.exception.GlobalExceptionHandler;
+import com.citymate.userapi.resource.AdminResource;
 import com.citymate.userapi.resource.AuthResource;
 import com.citymate.userapi.resource.UserResource;
 import io.swagger.v3.jaxrs2.integration.resources.OpenApiResource;
@@ -31,6 +32,7 @@ public class JerseyConfig extends ResourceConfig {
         // Enregistrer les Resources
         register(AuthResource.class);
         register(UserResource.class);
+        register(AdminResource.class);
 
         // Swagger OpenAPI
         register(OpenApiResource.class);
