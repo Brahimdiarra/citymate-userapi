@@ -2,9 +2,7 @@ name: CI/CD — User API
 
 on:
   push:
-    branches: [main]
   pull_request:
-    branches: [main]
 
 env:
   REGISTRY: ghcr.io
