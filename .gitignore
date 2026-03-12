@@ -32,3 +32,5 @@ logs/
 # application-local.properties
 
 .env
+
+bin/
