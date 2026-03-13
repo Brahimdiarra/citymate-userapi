@@ -75,7 +75,7 @@ public class AuthService {
         user.setLastLogin(LocalDateTime.now());
         userRepository.save(user);
 
-        String accessToken = jwtUtil.generateAccessToken(loginRequest.getUsername(), role);
+        String accessToken = jwtUtil.generateAccessToken(loginRequest.getUsername(), role, user.getId());
         String refreshToken = jwtUtil.generateRefreshToken(loginRequest.getUsername());
 
         JwtResponse response = new JwtResponse(accessToken, refreshToken, loginRequest.getUsername());
@@ -131,7 +131,7 @@ public class AuthService {
         }
 
         // Générer tokens
-        String accessToken = jwtUtil.generateAccessToken(user.getUsername(), "STUDENT");
+        String accessToken = jwtUtil.generateAccessToken(user.getUsername(), "STUDENT", user.getId());
         String refreshToken = jwtUtil.generateRefreshToken(user.getUsername());
         JwtResponse response = new JwtResponse(accessToken, refreshToken, user.getUsername());
         response.setRole("STUDENT");
@@ -165,8 +165,8 @@ public class AuthService {
                 .findFirst()
                 .orElse("CLIENT");
 
-        // Générer un nouvel access token avec le rôle
-        String newAccessToken = jwtUtil.generateAccessToken(username, role);
+        // Générer un nouvel access token avec le rôle et l'id
+        String newAccessToken = jwtUtil.generateAccessToken(username, role, existingUser.getId());
 
         JwtResponse response = new JwtResponse(newAccessToken, refreshToken, username);
         response.setRole(role);

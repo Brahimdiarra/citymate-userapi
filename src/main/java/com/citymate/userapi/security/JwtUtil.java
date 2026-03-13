@@ -54,6 +54,17 @@ public class JwtUtil {
     }
 
     /**
+     * Génère un ACCESS TOKEN avec le rôle et l'id utilisateur (15 min)
+     */
+    public String generateAccessToken(String username, String role, Long userId) {
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("type", "access");
+        claims.put("role", role);
+        claims.put("userId", userId);
+        return createToken(claims, username, accessTokenExpiration);
+    }
+
+    /**
      * Extrait le rôle d'un token
      */
     public String extractRole(String token) {
