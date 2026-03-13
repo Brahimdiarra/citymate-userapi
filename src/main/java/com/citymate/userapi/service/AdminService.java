@@ -59,6 +59,11 @@ public class AdminService {
 
         user.getRoles().clear();
         user.getRoles().add(role);
+
+        try {
+            user.setProfileType(User.ProfileType.valueOf(roleName));
+        } catch (IllegalArgumentException ignored) {}
+
         userRepository.save(user);
         return UserMapper.toDTO(user);
     }

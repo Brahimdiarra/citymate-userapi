@@ -98,6 +98,6 @@ public class User {
     public enum ProfileType {
         STUDENT,
         EMPLOYEE,
-        OTHER
+        ADMIN
     }
 }
