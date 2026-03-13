@@ -11,16 +11,6 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Resource JAX-RS pour les opérations ADMIN
- * Tous les endpoints sont protégés par le rôle ADMIN (SecurityConfig)
- *
- * Endpoints:
- * - GET  /api/v1/admin/users               → Lister tous les utilisateurs
- * - PUT  /api/v1/admin/users/{username}/activate   → Activer un compte
- * - PUT  /api/v1/admin/users/{username}/deactivate → Désactiver un compte
- * - PUT  /api/v1/admin/users/{username}/role       → Changer le rôle
- */
 @Component
 @Path("/admin")
 @Produces(MediaType.APPLICATION_JSON)

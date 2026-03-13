@@ -7,10 +7,6 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
-/**
- * DTO pour les informations utilisateur
- * N'expose PAS le passwordHash ni les infos sensibles
- */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -29,9 +25,6 @@ public class UserDTO {
     private Boolean isVerified;
     private LocalDateTime createdAt;
 
-    /**
-     * Constructeur qui convertit une Entity User en DTO
-     */
     public UserDTO(User user) {
         this.id = user.getId();
         this.username = user.getUsername();

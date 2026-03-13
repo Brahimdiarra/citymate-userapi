@@ -26,11 +26,6 @@ import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
-/**
- * Service qui gère l'authentification
- * - Login
- * - Register
- */
 @Service
 public class AuthService {
 
@@ -49,11 +44,6 @@ public class AuthService {
     @Autowired
     private JwtUtil jwtUtil;
 
-    /**
-     * Connexion d'un utilisateur
-     * @param loginRequest Username + Password
-     * @return Token JWT
-     */
     @Transactional
     public JwtResponse login(LoginRequest loginRequest) {
         Authentication authentication = authenticationManager.authenticate(
@@ -83,19 +73,12 @@ public class AuthService {
         return response;
     }
 
-    /**
-     * Inscription d'un nouvel utilisateur
-     * @param registerRequest Données d'inscription
-     * @return Token JWT
-     */
     @Transactional
     public JwtResponse register(RegisterRequest registerRequest) {
-        // Vérifier si username existe
         if (userRepository.existsByUsername(registerRequest.getUsername())) {
             throw new ConflictException("Username déjà utilisé");
         }
 
-        // Vérifier si email existe
         if (userRepository.existsByEmail(registerRequest.getEmail())) {
             throw new ConflictException("Email déjà utilisé");
         }
@@ -130,7 +113,6 @@ public class AuthService {
             throw new ConflictException("Username ou email déjà utilisé");
         }
 
-        // Générer tokens
         String accessToken = jwtUtil.generateAccessToken(user.getUsername(), "STUDENT", user.getId());
         String refreshToken = jwtUtil.generateRefreshToken(user.getUsername());
         JwtResponse response = new JwtResponse(accessToken, refreshToken, user.getUsername());
@@ -138,26 +120,17 @@ public class AuthService {
         return response;
     }
 
-    /**
-     * Renouvellement d'un access token via un refresh token valide
-     * @param refreshToken Le refresh token (24h) envoyé par le client
-     * @return Nouveau JwtResponse avec un nouvel access token
-     */
     public JwtResponse refresh(String refreshToken) {
-        // Vérifier que c'est bien un refresh token (type = "refresh")
         if (!jwtUtil.isRefreshToken(refreshToken)) {
             throw new UnauthorizedException("Token fourni n'est pas un refresh token");
         }
 
-        // Vérifier que le refresh token est valide et non expiré
         if (!jwtUtil.validateToken(refreshToken)) {
             throw new UnauthorizedException("Refresh token invalide ou expiré");
         }
 
-        // Extraire le username du refresh token
         String username = jwtUtil.extractUsername(refreshToken);
 
-        // Vérifier que l'utilisateur existe toujours en base
         User existingUser = userRepository.findByUsername(username)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "username", username));
         String role = existingUser.getRoles().stream()
@@ -165,7 +138,6 @@ public class AuthService {
                 .findFirst()
                 .orElse("CLIENT");
 
-        // Générer un nouvel access token avec le rôle et l'id
         String newAccessToken = jwtUtil.generateAccessToken(username, role, existingUser.getId());
 
         JwtResponse response = new JwtResponse(newAccessToken, refreshToken, username);

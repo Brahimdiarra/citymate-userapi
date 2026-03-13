@@ -8,10 +8,6 @@ import jakarta.ws.rs.ext.ExceptionMapper;
 import jakarta.ws.rs.ext.Provider;
 import org.springframework.security.authentication.BadCredentialsException;
 
-/**
- * Gestionnaire global des exceptions pour JAX-RS
- * Intercepte toutes les exceptions et retourne des ErrorResponse standardisées
- */
 @Provider
 public class GlobalExceptionHandler implements ExceptionMapper<Exception> {
 
@@ -24,7 +20,6 @@ public class GlobalExceptionHandler implements ExceptionMapper<Exception> {
         ErrorResponse errorResponse;
         Response.Status status;
 
-        // ResourceNotFoundException → 404
         if (exception instanceof ResourceNotFoundException) {
             status = Response.Status.NOT_FOUND;
             errorResponse = new ErrorResponse(
@@ -34,7 +29,6 @@ public class GlobalExceptionHandler implements ExceptionMapper<Exception> {
                     getPath()
             );
         }
-        // ConflictException → 409
         else if (exception instanceof ConflictException) {
             status = Response.Status.CONFLICT;
             errorResponse = new ErrorResponse(
@@ -44,7 +38,6 @@ public class GlobalExceptionHandler implements ExceptionMapper<Exception> {
                     getPath()
             );
         }
-        // BadRequestException → 400
         else if (exception instanceof BadRequestException) {
             status = Response.Status.BAD_REQUEST;
             errorResponse = new ErrorResponse(
@@ -54,7 +47,6 @@ public class GlobalExceptionHandler implements ExceptionMapper<Exception> {
                     getPath()
             );
         }
-        // UnauthorizedException → 401 (message de l'exception)
         else if (exception instanceof UnauthorizedException) {
             status = Response.Status.UNAUTHORIZED;
             errorResponse = new ErrorResponse(
@@ -64,7 +56,6 @@ public class GlobalExceptionHandler implements ExceptionMapper<Exception> {
                     getPath()
             );
         }
-        // BadCredentialsException → 401 (mauvais identifiants)
         else if (exception instanceof BadCredentialsException) {
             status = Response.Status.UNAUTHORIZED;
             errorResponse = new ErrorResponse(
@@ -74,7 +65,6 @@ public class GlobalExceptionHandler implements ExceptionMapper<Exception> {
                     getPath()
             );
         }
-        // Exception générique → 500
         else {
             status = Response.Status.INTERNAL_SERVER_ERROR;
             errorResponse = new ErrorResponse(
@@ -83,7 +73,6 @@ public class GlobalExceptionHandler implements ExceptionMapper<Exception> {
                     "Une erreur interne s'est produite",
                     getPath()
             );
-            // Log l'erreur en production
             System.err.println("Erreur non gérée : " + exception.getMessage());
             exception.printStackTrace();
         }

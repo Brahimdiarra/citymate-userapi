@@ -7,10 +7,6 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
-/**
- * Entity Role - Représente un rôle dans le système
- * Rôles : VISITOR, CLIENT, ADMIN
- */
 @Entity
 @Table(name = "roles")
 @Data
@@ -36,7 +32,6 @@ public class Role {
         this.createdAt = LocalDateTime.now();
     }
 
-    // Constructeur personnalisé
     public Role(String name, String description) {
         this.name = name;
         this.description = description;

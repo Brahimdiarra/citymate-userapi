@@ -14,10 +14,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 
-/**
- * Service qui charge les infos utilisateur depuis la DB
- * pour Spring Security
- */
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService {
 
@@ -27,16 +23,13 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     @Override
     @Transactional
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        // 1. Chercher l'utilisateur dans la DB
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
 
-        // 2. Convertir les rôles en GrantedAuthority
         List<GrantedAuthority> authorities = user.getRoles().stream()
                 .map(role -> new SimpleGrantedAuthority("ROLE_" + role.getName()))
                 .collect(Collectors.toList());
 
-        // 3. Retourner un UserDetails Spring Security
         return org.springframework.security.core.userdetails.User
                 .builder()
                 .username(user.getUsername())

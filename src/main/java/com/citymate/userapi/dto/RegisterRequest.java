@@ -9,10 +9,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/**
- * DTO pour la requête d'inscription
- * Utilisé dans l'endpoint POST /api/auth/register
- */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

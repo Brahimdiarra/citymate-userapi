@@ -8,10 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
-/**
- * Initialise les données de base au démarrage de l'application
- * - Crée les rôles (VISITOR, CLIENT, ADMIN, STUDENT) s'ils n'existent pas
- */
 @Component
 public class DataInitializer implements CommandLineRunner {
 

@@ -8,10 +8,6 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
-/**
- * DTO standardisé pour les réponses d'erreur
- * Retourné automatiquement par le GlobalExceptionHandler
- */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -34,9 +30,6 @@ public class ErrorResponse {
     @Schema(description = "Chemin de l'endpoint appelé")
     private String path;
 
-    /**
-     * Constructeur simplifié
-     */
     public ErrorResponse(int status, String error, String message, String path) {
         this.timestamp = LocalDateTime.now();
         this.status = status;

@@ -25,18 +25,12 @@ public class AdminService {
     @Autowired
     private RoleRepository roleRepository;
 
-    /**
-     * Lister tous les utilisateurs
-     */
     public List<UserDTO> getAllUsers() {
         return userRepository.findAll().stream()
                 .map(UserMapper::toDTO)
                 .collect(Collectors.toList());
     }
 
-    /**
-     * Activer ou désactiver un compte utilisateur
-     */
     @Transactional
     public UserDTO setUserActive(String username, boolean active) {
         User user = userRepository.findByUsername(username)
@@ -46,9 +40,6 @@ public class AdminService {
         return UserMapper.toDTO(user);
     }
 
-    /**
-     * Changer le rôle d'un utilisateur
-     */
     @Transactional
     public UserDTO changeUserRole(String username, String roleName) {
         User user = userRepository.findByUsername(username)

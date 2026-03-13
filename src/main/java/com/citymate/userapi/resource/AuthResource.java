@@ -19,13 +19,6 @@ import jakarta.ws.rs.core.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-/**
- * Resource JAX-RS pour l'authentification
- * Endpoints:
- * - POST /api/v1/auth/login
- * - POST /api/v1/auth/register
- * - GET /api/v1/auth/health
- */
 @Component
 @Path("/auth")
 @Produces(MediaType.APPLICATION_JSON)

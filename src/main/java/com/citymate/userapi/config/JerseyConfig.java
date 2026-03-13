@@ -16,12 +16,6 @@ import org.springframework.context.annotation.Configuration;
 
 import jakarta.ws.rs.ApplicationPath;
 
-/**
- * Configuration Jersey (JAX-RS)
- * Définit le chemin de base de l'API : /api/v1
- * Enregistre les Resources
- * Configure OpenAPI/Swagger pour l'auto-documentation
- */
 @Configuration
 @ApplicationPath("/api/v1")
 @OpenAPIDefinition(info = @Info(title = "CityMate User API", version = "1.0.0", description = "API REST pour la gestion des utilisateurs et l'authentification", contact = @Contact(name = "CityMate Team", email = "support@citymate.com"), license = @License(name = "Apache 2.0", url = "https://www.apache.org/licenses/LICENSE-2.0.html")))
@@ -29,15 +23,10 @@ import jakarta.ws.rs.ApplicationPath;
 public class JerseyConfig extends ResourceConfig {
 
     public JerseyConfig() {
-        // Enregistrer les Resources
         register(AuthResource.class);
         register(UserResource.class);
         register(AdminResource.class);
-
-        // Swagger OpenAPI
         register(OpenApiResource.class);
-
-        // ✅ Enregistrer le gestionnaire d'exceptions global
         register(GlobalExceptionHandler.class);
     }
 }

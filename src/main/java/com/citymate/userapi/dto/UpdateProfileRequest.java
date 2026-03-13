@@ -7,10 +7,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/**
- * DTO pour la requête de mise à jour de profil
- * Utilisé dans PUT /api/v1/users/me
- */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

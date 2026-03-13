@@ -10,9 +10,6 @@ import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
-/**
- * Entity User - Représente un utilisateur dans le système
- */
 @Entity
 @Table(name = "users")
 @Data
@@ -74,7 +71,6 @@ public class User {
     @Column(name = "last_login")
     private LocalDateTime lastLogin;
 
-    // Relation Many-to-Many avec Role
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "user_roles",
@@ -94,7 +90,6 @@ public class User {
         this.updatedAt = LocalDateTime.now();
     }
 
-    // Enum pour le type de profil
     public enum ProfileType {
         STUDENT,
         EMPLOYEE,

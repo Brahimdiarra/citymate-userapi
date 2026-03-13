@@ -5,11 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/**
- * DTO public pour afficher le profil d'un autre utilisateur.
- * Ne contient que les informations visibles publiquement.
- * N'expose PAS : email, id, isActive, isVerified, createdAt
- */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

@@ -30,22 +30,12 @@ public class JwtUtil {
     @Value("${jwt.refresh-token-expiration}")
     private Long refreshTokenExpiration;
 
-    // ============================================
-    // GÉNÉRATION DE TOKENS
-    // ============================================
-
-    /**
-     * Génère un ACCESS TOKEN (15 min)
-     */
     public String generateAccessToken(String username) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("type", "access");
         return createToken(claims, username, accessTokenExpiration);
     }
 
-    /**
-     * Génère un ACCESS TOKEN avec le rôle (15 min)
-     */
     public String generateAccessToken(String username, String role) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("type", "access");
@@ -53,9 +43,6 @@ public class JwtUtil {
         return createToken(claims, username, accessTokenExpiration);
     }
 
-    /**
-     * Génère un ACCESS TOKEN avec le rôle et l'id utilisateur (15 min)
-     */
     public String generateAccessToken(String username, String role, Long userId) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("type", "access");
@@ -64,9 +51,6 @@ public class JwtUtil {
         return createToken(claims, username, accessTokenExpiration);
     }
 
-    /**
-     * Extrait le rôle d'un token
-     */
     public String extractRole(String token) {
         try {
             return extractClaim(token, claims -> claims.get("role", String.class));
@@ -75,18 +59,12 @@ public class JwtUtil {
         }
     }
 
-    /**
-     * Génère un REFRESH TOKEN (24h)
-     */
     public String generateRefreshToken(String username) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("type", "refresh");
         return createToken(claims, username, refreshTokenExpiration);
     }
 
-    /**
-     * Crée un token JWT
-     */
     private String createToken(Map<String, Object> claims, String subject, Long expiration) {
         SecretKey key = Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.UTF_8));
 
@@ -99,13 +77,6 @@ public class JwtUtil {
                 .compact();
     }
 
-    // ============================================
-    // VALIDATION DE TOKENS
-    // ============================================
-
-    /**
-     * Valide un token
-     */
     public boolean validateToken(String token, String username) {
         try {
             final String tokenUsername = extractUsername(token);
@@ -121,9 +92,6 @@ public class JwtUtil {
         }
     }
 
-    /**
-     * Valide un token (version simple pour le filter)
-     */
     public boolean validateToken(String token) {
         try {
             extractAllClaims(token);
@@ -139,9 +107,6 @@ public class JwtUtil {
         }
     }
 
-    /**
-     * Vérifie si c'est un ACCESS TOKEN
-     */
     public boolean isAccessToken(String token) {
         try {
             String type = extractClaim(token, claims -> claims.get("type", String.class));
@@ -151,9 +116,6 @@ public class JwtUtil {
         }
     }
 
-    /**
-     * Vérifie si c'est un REFRESH TOKEN
-     */
     public boolean isRefreshToken(String token) {
         try {
             String type = extractClaim(token, claims -> claims.get("type", String.class));
@@ -162,10 +124,6 @@ public class JwtUtil {
             return false;
         }
     }
-
-    // ============================================
-    // EXTRACTION D'INFORMATIONS
-    // ============================================
 
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);

@@ -53,7 +53,6 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
 
                 .authorizeHttpRequests(auth -> auth
-                        //  Endpoints PUBLICS
                         .requestMatchers("/api/v1/auth/**").permitAll()
                         .requestMatchers("/actuator/**").permitAll()
                         .requestMatchers("/swagger-ui/**", "/api-docs/**").permitAll()
@@ -61,10 +60,8 @@ public class SecurityConfig {
                         .requestMatchers("/api/v1/openapi.json", "/api/v1/openapi.yaml").permitAll()
                         .requestMatchers("/swagger-ui.html").permitAll()
 
-                        //  Endpoints ADMIN
                         .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
 
-                        //  Tous les autres endpoints
                         .anyRequest().authenticated()
                 )
 

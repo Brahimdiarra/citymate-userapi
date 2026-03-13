@@ -22,13 +22,6 @@ import jakarta.ws.rs.core.SecurityContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-/**
- * Resource JAX-RS pour les utilisateurs
- * Endpoints:
- * - GET /api/v1/users/me
- * - GET /api/v1/users/{username}
- * - PUT /api/v1/users/me
- */
 @Component
 @Path("/users")
 @Produces(MediaType.APPLICATION_JSON)

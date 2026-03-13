@@ -11,18 +11,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-/**
- * Service pour gérer les utilisateurs
- */
 @Service
 public class UserService {
 
     @Autowired
     private UserRepository userRepository;
 
-    /**
-     * Récupérer son propre profil complet (données privées incluses)
-     */
     public UserDTO getUserByUsername(String username) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "username", username));
@@ -30,10 +24,6 @@ public class UserService {
         return UserMapper.toDTO(user);
     }
 
-    /**
-     * Récupérer le profil public d'un autre utilisateur (données limitées)
-     * Ne retourne que les champs visibles publiquement
-     */
     public PublicUserDTO getPublicUserByUsername(String username) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "username", username));
@@ -41,9 +31,6 @@ public class UserService {
         return new PublicUserDTO(user);
     }
 
-    /**
-     * Mettre à jour le profil d'un utilisateur
-     */
     @Transactional
     public UserDTO updateProfile(String username, UpdateProfileRequest request) {
         User user = userRepository.findByUsername(username)

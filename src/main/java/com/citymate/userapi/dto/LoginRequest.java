@@ -5,10 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/**
- * DTO pour la requête de connexion
- * Utilisé dans l'endpoint POST /api/auth/login
- */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
