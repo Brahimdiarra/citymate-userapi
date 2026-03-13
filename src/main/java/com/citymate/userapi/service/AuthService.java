@@ -118,7 +118,7 @@ public class AuthService {
         // deux requêtes simultanées peuvent passer les checks ci-dessus
         // mais la contrainte UNIQUE PostgreSQL rejettera la seconde insertion
         try {
-            userRepository.save(user);
+            user = userRepository.save(user);
         } catch (DataIntegrityViolationException e) {
             // Déterminer quel champ est en doublon via le message de l'exception
             String msg = e.getMessage() != null ? e.getMessage().toLowerCase() : "";

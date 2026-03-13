@@ -54,6 +54,7 @@ class AuthServiceTest {
 
         Role role = new Role("STUDENT", "Étudiant");
         User user = new User();
+        user.setId(1L);
         user.setUsername("alice");
         user.setRoles(Set.of(role));
 
@@ -61,7 +62,7 @@ class AuthServiceTest {
                 .thenReturn(new UsernamePasswordAuthenticationToken("alice", "Test1234!"));
         when(userRepository.findByUsername("alice")).thenReturn(Optional.of(user));
         when(userRepository.save(any(User.class))).thenReturn(user);
-        when(jwtUtil.generateAccessToken("alice", "STUDENT")).thenReturn("access-token");
+        when(jwtUtil.generateAccessToken("alice", "STUDENT", 1L)).thenReturn("access-token");
         when(jwtUtil.generateRefreshToken("alice")).thenReturn("refresh-token");
 
         // When
@@ -100,12 +101,16 @@ class AuthServiceTest {
 
         Role studentRole = new Role("STUDENT", "Étudiant");
 
+        User savedUser = new User();
+        savedUser.setId(2L);
+        savedUser.setUsername("bob");
+
         when(userRepository.existsByUsername("bob")).thenReturn(false);
         when(userRepository.existsByEmail("bob@example.com")).thenReturn(false);
         when(roleRepository.findByName("STUDENT")).thenReturn(Optional.of(studentRole));
         when(passwordEncoder.encode("Test1234!")).thenReturn("encoded-password");
-        when(userRepository.save(any(User.class))).thenReturn(new User());
-        when(jwtUtil.generateAccessToken("bob", "STUDENT")).thenReturn("access-token");
+        when(userRepository.save(any(User.class))).thenReturn(savedUser);
+        when(jwtUtil.generateAccessToken("bob", "STUDENT", 2L)).thenReturn("access-token");
         when(jwtUtil.generateRefreshToken("bob")).thenReturn("refresh-token");
 
         // When
@@ -158,6 +163,7 @@ class AuthServiceTest {
         String refreshToken = "valid-refresh-token";
         Role role = new Role("STUDENT", "Étudiant");
         User user = new User();
+        user.setId(1L);
         user.setUsername("alice");
         user.setRoles(Set.of(role));
 
@@ -165,7 +171,7 @@ class AuthServiceTest {
         when(jwtUtil.validateToken(refreshToken)).thenReturn(true);
         when(jwtUtil.extractUsername(refreshToken)).thenReturn("alice");
         when(userRepository.findByUsername("alice")).thenReturn(Optional.of(user));
-        when(jwtUtil.generateAccessToken("alice", "STUDENT")).thenReturn("new-access-token");
+        when(jwtUtil.generateAccessToken("alice", "STUDENT", 1L)).thenReturn("new-access-token");
 
         // When
         JwtResponse response = authService.refresh(refreshToken);
